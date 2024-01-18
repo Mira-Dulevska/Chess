@@ -151,25 +151,21 @@ public class MainFrame extends JFrame {
 				for (int k = 0; k < 8; k++) {
 					if (field[a][b].figure.validMove(a, b, i, k, turn) && field[i][k].figure.team != turn) {
 						moveFigure(a, b, i, k);
-						if(field[a][b].figure.team != 0) {
-							saverTeam = field[a][b].figure.team;
-							saverIcon = field[a][b].button.getIcon();
-							saverFigure = field[a][b].figure;
-							eraseFigure(a, b);
-						}
+						saverTeam = field[a][b].figure.team;
+						saverIcon = field[a][b].button.getIcon();
+						saverFigure = field[a][b].figure;
+						eraseFigure(a, b);
 							
 						if (check() == true) {
 							moveFigure(i, k, a, b);
-							if(saverTeam != 0) {
-								field[i][k].button.setIcon(saverIcon);
-								field[i][k].figure = saverFigure;
-							}
+							field[i][k].figure.team = saverTeam;
+							field[i][k].button.setIcon(saverIcon);
+							field[i][k].figure = saverFigure;
 						} else {
 							moveFigure(i, k, a, b);
-							if(saverTeam != 0) {
-								field[i][k].button.setIcon(saverIcon);
-								field[i][k].figure = saverFigure;
-							}
+							field[i][k].figure.team = saverTeam;
+							field[i][k].button.setIcon(saverIcon);
+							field[i][k].figure = saverFigure;
 							return false;
 						}
 					}
@@ -218,6 +214,86 @@ public class MainFrame extends JFrame {
 				lblMessages.setText("Шах и мат за черните!");
 				lblMessages.setForeground(new Color(218, 165, 32));
 			}
+			return true;
+		} else
+			return false;
+	}
+	
+	public static boolean stalemate(int turn) {
+		if (!check()) {
+
+			int a = 0, b = 0;
+			for (int i = 0; i < 8; i++) {
+				for (int k = 0; k < 8; k++) {
+					if (field[i][k].figure.type == "king" && field[i][k].figure.team == turn) {
+						a = i;
+						b = k;
+					}
+				}
+			}
+			// System.out.println(a + " " + b);
+			for (int i = 0; i < 8; i++) {
+				for (int k = 0; k < 8; k++) {
+					if (field[a][b].figure.validMove(a, b, i, k, turn) && field[i][k].figure.team != turn) {
+						moveFigure(a, b, i, k);
+						saverTeam = field[a][b].figure.team;
+						saverIcon = field[a][b].button.getIcon();
+						saverFigure = field[a][b].figure;
+						eraseFigure(a, b);
+							
+						if (check() == true) {
+							moveFigure(i, k, a, b);
+							field[i][k].figure.team = saverTeam;
+							field[i][k].button.setIcon(saverIcon);
+							field[i][k].figure = saverFigure;
+						} else {
+							moveFigure(i, k, a, b);
+							field[i][k].figure.team = saverTeam;
+							field[i][k].button.setIcon(saverIcon);
+							field[i][k].figure = saverFigure;
+							return false;
+						}
+					}
+				}
+			}
+			// System.out.println(a + " " + b);
+
+			int dx, dy;
+			if (a < xKiller)
+				dx = 1;
+			else if (a == xKiller)
+				dx = 0;
+			else
+				dx = -1;
+
+			if (b < yKiller)
+				dy = 1;
+			else if (b == yKiller)
+				dy = 0;
+			else
+				dy = -1;
+
+			do {
+				a = a + dx;
+				b = b + dy;
+				for (int i = 0; i < 8; i++) {
+					for (int k = 0; k < 8; k++) {
+						if (field[i][k].figure.validMove(i, k, a, b, field[a][b].figure.team)
+								&& jumpOverFigures(i, k, a, b)) {
+							moveFigure(i, k, a, b);
+							if (check()) {
+								moveFigure(a, b, i, k);
+							} else {
+								moveFigure(a, b, i, k);
+								return false;
+							}
+						}
+					}
+				}
+			} while (a != xKiller && b != yKiller);
+			
+			lblMessages.setText("Пат!");
+			lblMessages.setForeground(new Color(218, 165, 32));
 			return true;
 		} else
 			return false;
@@ -408,12 +484,10 @@ public class MainFrame extends JFrame {
 							}
 							
 							moveFigure(movex, movey, x, y);
-							if(field[movex][movey].figure.team != 0) {
-								saverIcon = field[movex][movey].button.getIcon();
-								saverFigure = field[movex][movey].figure;
-								saverTeam = field[movex][movey].figure.team;
-								eraseFigure(movex, movey);
-							}
+							saverIcon = field[movex][movey].button.getIcon();
+							saverFigure = field[movex][movey].figure;
+							saverTeam = field[movex][movey].figure.team;
+							eraseFigure(movex, movey);
 								
 							if (check() == true && field[xKiller][yKiller].figure.team != turn) {
 								moveFigure(x, y, movex, movey);
@@ -426,26 +500,24 @@ public class MainFrame extends JFrame {
 								stage = 0;
 								return;
 							} 
-							if (saverTeam != 0) {
-								if (saverTeam == -1) {
-									JLabel lblKilled = new JLabel("");
-									lblKilled.setBounds((n1 % 8) * 75, 125 - (n1 / 8) * 75, 75, 75);
-									lblKilled.setIcon(saverIcon);
-									panel_Player1.add(lblKilled);
-									panel_Player1.revalidate();
-									panel_Player1.repaint();
-									n1 = n1 + 1;
-								} else {
-									JLabel lblKilled = new JLabel("");
-									lblKilled.setBounds((n2 % 8) * 75, 0 + (n2 / 8) * 75, 75, 75);
-									lblKilled.setIcon(saverIcon);
-									panel_Player2.add(lblKilled);
-									panel_Player2.revalidate();
-									panel_Player2.repaint();
-									n2 = n2 + 1;
-								}
-								saverTeam = 0;
+							if (saverTeam == -1) {
+								JLabel lblKilled = new JLabel("");
+								lblKilled.setBounds((n1 % 8) * 75, 125 - (n1 / 8) * 75, 75, 75);
+								lblKilled.setIcon(saverIcon);
+								panel_Player1.add(lblKilled);
+								panel_Player1.revalidate();
+								panel_Player1.repaint();
+								n1 = n1 + 1;
+							} else if (saverTeam == 1){
+								JLabel lblKilled = new JLabel("");
+								lblKilled.setBounds((n2 % 8) * 75, 0 + (n2 / 8) * 75, 75, 75);
+								lblKilled.setIcon(saverIcon);
+								panel_Player2.add(lblKilled);
+								panel_Player2.revalidate();
+								panel_Player2.repaint();
+								n2 = n2 + 1;
 							}
+								saverTeam = 0;
 							if (field[x][y].figure.type == "pawn" && (x == 0 || x == 7)) {
 								field[x][y].figure.type = "queen";
 								if (field[x][y].figure.team == -1)
