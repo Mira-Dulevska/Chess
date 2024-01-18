@@ -23,7 +23,7 @@ public class MainFrame extends JFrame {
 	private static JPanel panel_Player1;
 	private static JPanel panel_Player2;
 	static int n1 = 0, n2 = 0;
-	private static JLabel lblMessages = new JLabel("Äà èãðàåì!");
+	private static JLabel lblMessages = new JLabel("Да играем!");
 	private static int xKiller = 0;
 	private static int yKiller = 0;
 	static Icon saverIcon;
@@ -109,7 +109,7 @@ public class MainFrame extends JFrame {
 					if (field[i][k].figure.validMove(i, k, c, d, -1) && jumpOverFigures(i, k, c, d)) {
 						xKiller = i;
 						yKiller = k;
-						lblMessages.setText("Øàõ çà ÷åðíèòå!");
+						lblMessages.setText("Шах за черните!");
 						lblMessages.setForeground(new Color(0, 100, 0));
 						return true;
 					}
@@ -118,7 +118,7 @@ public class MainFrame extends JFrame {
 					if (field[i][k].figure.validMove(i, k, a, b, 1) && jumpOverFigures(i, k, a, b)) {
 						xKiller = i;
 						yKiller = k;
-						lblMessages.setText("Øàõ çà áåëèòå!");
+						lblMessages.setText("Шах за белите!");
 						lblMessages.setForeground(new Color(0, 100, 0));
 						return true;
 					}
@@ -132,9 +132,9 @@ public class MainFrame extends JFrame {
 	public static boolean checkmate() {
 		if (check()) {
 			int turn = 0;
-			if (lblMessages.getText() == "Øàõ çà áåëèòå!")
+			if (lblMessages.getText() == "Шах за белите!")
 				turn = -1;
-			if (lblMessages.getText() == "Øàõ çà ÷åðíèòå!")
+			if (lblMessages.getText() == "Шах за черните!")
 				turn = 1;
 
 			int a = 0, b = 0;
@@ -212,10 +212,10 @@ public class MainFrame extends JFrame {
 			} while (a != xKiller && b != yKiller);
 
 			if (turn == -1) {
-				lblMessages.setText("Øàõ è ìàò çà áåëèòå!");
+				lblMessages.setText("Шах и мат за белите!");
 				lblMessages.setForeground(new Color(218, 165, 32));
 			} else {
-				lblMessages.setText("Øàõ è ìàò çà ÷åðíèòå!");
+				lblMessages.setText("Шах и мат за черните!");
 				lblMessages.setForeground(new Color(218, 165, 32));
 			}
 			return true;
@@ -372,18 +372,19 @@ public class MainFrame extends JFrame {
 				final int x = i, y = k;
 				field[i][k].button.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						lblMessages.setText("Да играем!");
+						lblMessages.setForeground(Color.BLACK);
 						if (checkmate()) {
-							lblMessages.setText("Шах и мат!");
-							lblMessages.setForeground(new Color(218, 165, 32));
+							checkmate();
 							return;
 						}
 						if (stage == 0) {
 							if (field[x][y].figure.team != turn) {
 								if (turn == -1) {
-									lblMessages.setText("Áåëèòå ñà íà õîä!");
+									lblMessages.setText("Белите са на ход!");
 									lblMessages.setForeground(Color.RED);
 								} else {
-									lblMessages.setText("×åðíèòå ñà íà õîä!");
+									lblMessages.setText("Черните са на ход!");
 									lblMessages.setForeground(Color.RED);
 								}
 								return;
@@ -391,7 +392,7 @@ public class MainFrame extends JFrame {
 							movex = x;
 							movey = y;
 							stage = 1;
-							lblMessages.setText("Äà èãðàåì!");
+							lblMessages.setText("Да играем!");
 							lblMessages.setForeground(Color.BLACK);
 						} else if (stage == 1) {
 							if (field[x][y].figure.team == turn) {
@@ -401,7 +402,7 @@ public class MainFrame extends JFrame {
 							}
 							if ((!field[movex][movey].figure.validMove(movex, movey, x, y, field[x][y].figure.team))
 									|| !(jumpOverFigures(movex, movey, x, y))) {
-								lblMessages.setText("Íåâàëèäåí õîä!");
+								lblMessages.setText("Невалиден ход!");
 								lblMessages.setForeground(Color.RED);
 								return;
 							}
@@ -420,8 +421,9 @@ public class MainFrame extends JFrame {
 									field[x][y].button.setIcon(saverIcon);
 									field[x][y].figure = saverFigure;
 								}
-								lblMessages.setText("Íåâàëèäåí õîä - â øàõ ñè!");
+								lblMessages.setText("Невалиден ход - в шах си!");
 								lblMessages.setForeground(Color.RED);
+								stage = 0;
 								return;
 							} 
 							if (saverTeam != 0) {
@@ -451,8 +453,10 @@ public class MainFrame extends JFrame {
 								else
 									field[x][y].button.setIcon(black_queen);
 							}
-							if (!check()) {
-								lblMessages.setText("Äà èãðàåì!");
+							if(check()) {
+								check();
+							} else {
+								lblMessages.setText("Да играем!");
 								lblMessages.setForeground(Color.BLACK);
 							}
 							checkmate();
