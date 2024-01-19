@@ -230,30 +230,39 @@ public class MainFrame extends JFrame {
 					}
 				}
 			}
-			// System.out.println(a + " " + b);
+			int c = 0, d = 0, e = 0;
 			for (int i = 0; i < 8; i++) {
 				for (int k = 0; k < 8; k++) {
-					if (field[a][b].figure.validMove(a, b, i, k, turn) && field[i][k].figure.team != turn) {
-						moveFigure(a, b, i, k);
-						saverTeam = field[a][b].figure.team;
-						saverIcon = field[a][b].button.getIcon();
-						saverFigure = field[a][b].figure;
-						eraseFigure(a, b);
+					if(Math.max(Math.abs(a - i), Math.abs(b - k)) == 1) {
+						d = d +1;
+						if (field[a][b].figure.validMove(a, b, i, k, turn) && field[i][k].figure.team != turn) {
+							moveFigure(a, b, i, k);
+							saverTeam = field[a][b].figure.team;
+							saverIcon = field[a][b].button.getIcon();
+							saverFigure = field[a][b].figure;
+							eraseFigure(a, b);
 							
-						if (check() == true) {
-							moveFigure(i, k, a, b);
-							field[i][k].figure.team = saverTeam;
-							field[i][k].button.setIcon(saverIcon);
-							field[i][k].figure = saverFigure;
+							if (check() == true) {
+								moveFigure(i, k, a, b);
+								field[i][k].figure.team = saverTeam;
+								field[i][k].button.setIcon(saverIcon);
+								field[i][k].figure = saverFigure;
+								c = c + 1;
+							} else {
+								moveFigure(i, k, a, b);
+								field[i][k].figure.team = saverTeam;
+								field[i][k].button.setIcon(saverIcon);
+								field[i][k].figure = saverFigure;
+								return false;
+							}
 						} else {
-							moveFigure(i, k, a, b);
-							field[i][k].figure.team = saverTeam;
-							field[i][k].button.setIcon(saverIcon);
-							field[i][k].figure = saverFigure;
-							return false;
+							
 						}
 					}
 				}
+			}
+			if(c == d) {
+				
 			}
 			lblMessages.setText("Пат!");
 			lblMessages.setForeground(new Color(218, 165, 32));
