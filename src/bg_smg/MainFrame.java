@@ -221,7 +221,6 @@ public class MainFrame extends JFrame {
 	
 	public static boolean stalemate(int turn) {
 		if (!check()) {
-
 			int a = 0, b = 0;
 			for (int i = 0; i < 8; i++) {
 				for (int k = 0; k < 8; k++) {
@@ -256,42 +255,6 @@ public class MainFrame extends JFrame {
 					}
 				}
 			}
-			// System.out.println(a + " " + b);
-
-			int dx, dy;
-			if (a < xKiller)
-				dx = 1;
-			else if (a == xKiller)
-				dx = 0;
-			else
-				dx = -1;
-
-			if (b < yKiller)
-				dy = 1;
-			else if (b == yKiller)
-				dy = 0;
-			else
-				dy = -1;
-
-			do {
-				a = a + dx;
-				b = b + dy;
-				for (int i = 0; i < 8; i++) {
-					for (int k = 0; k < 8; k++) {
-						if (field[i][k].figure.validMove(i, k, a, b, field[a][b].figure.team)
-								&& jumpOverFigures(i, k, a, b)) {
-							moveFigure(i, k, a, b);
-							if (check()) {
-								moveFigure(a, b, i, k);
-							} else {
-								moveFigure(a, b, i, k);
-								return false;
-							}
-						}
-					}
-				}
-			} while (a != xKiller && b != yKiller);
-			
 			lblMessages.setText("Пат!");
 			lblMessages.setForeground(new Color(218, 165, 32));
 			return true;
@@ -367,7 +330,7 @@ public class MainFrame extends JFrame {
 		lblMessages.setForeground(Color.BLACK);
 		lblMessages.setFont(new Font("Tahoma", Font.PLAIN, 45));
 		lblMessages.setHorizontalAlignment(SwingConstants.CENTER);
-		lblMessages.setBounds(10, 12, 1320, 78);
+		lblMessages.setBounds(10, 12, 1274, 78);
 		contentPane.add(lblMessages);
 
 		JPanel panel_Player1 = new JPanel();
@@ -454,6 +417,10 @@ public class MainFrame extends JFrame {
 							checkmate();
 							return;
 						}
+						if (stalemate(turn)) {
+							stalemate(turn);
+							return;
+						}
 						if (stage == 0) {
 							if (field[x][y].figure.team != turn) {
 								if (turn == -1) {
@@ -531,7 +498,6 @@ public class MainFrame extends JFrame {
 								lblMessages.setText("Да играем!");
 								lblMessages.setForeground(Color.BLACK);
 							}
-							checkmate();
 							turn = turn * (-1);
 							if (turn == -1) {
 								lblPlayer1.setFont(new Font("Tahoma", Font.BOLD, 50));
