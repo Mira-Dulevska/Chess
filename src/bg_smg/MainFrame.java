@@ -166,7 +166,7 @@ public class MainFrame extends JFrame {
 					}
 				}
 			}
-			System.out.println("a " + a + "b " + b);
+			//System.out.println("a " + a + "b " + b);
 			// System.out.println(a + " " + b);
 			for (int i = 0; i < 8; i++) {
 				for (int k = 0; k < 8; k++) {
@@ -209,7 +209,7 @@ public class MainFrame extends JFrame {
 			else
 				dy = -1;
 			
-			System.out.println("xKiller " + xKiller + "yKiller " + yKiller);
+			//System.out.println("xKiller " + xKiller + "yKiller " + yKiller);
 
 			do {
 				a = a + dx;
@@ -218,7 +218,7 @@ public class MainFrame extends JFrame {
 					for (int k = 0; k < 8; k++) {
 						if (field[i][k].figure.validMove(i, k, a, b, field[a][b].figure.team)
 								&& jumpOverFigures(i, k, a, b)) {
-							System.out.println("a " + a + "b " + b);
+							//System.out.println("a " + a + "b " + b);
 							moveFigure(i, k, a, b);
 							if (check()) {
 								moveFigure(a, b, i, k);
