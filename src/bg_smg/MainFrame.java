@@ -58,7 +58,6 @@ public class MainFrame extends JFrame {
 		field[a][b].figure = new Figure();
 	}
 
-
 	public static boolean jumpOverFigures(int a, int b, int c, int d) {
 		if (field[a][b].figure.type == "knight")
 			return true;
@@ -86,6 +85,27 @@ public class MainFrame extends JFrame {
 			y = y + dy;
 		}
 		return true;
+	}
+
+	public static boolean kingToKing() {
+		int a = 0, b = 0, c = 0, d = 0;
+		for (int i = 0; i < 8; i++) {
+			for (int k = 0; k < 8; k++) {
+				if (field[i][k].figure.type == "king" && field[i][k].figure.team == -1) {
+					a = i;
+					b = k;
+				}
+				if (field[i][k].figure.type == "king" && field[i][k].figure.team == 1) {
+					c = i;
+					d = k;
+				}
+			}
+		}
+
+		if (Math.abs(a - c) <= 1 && Math.abs(b - d) <= 1) {
+			return true;
+		} else
+			return false;
 	}
 
 	public static boolean check() {
@@ -146,6 +166,7 @@ public class MainFrame extends JFrame {
 					}
 				}
 			}
+			System.out.println("a " + a + "b " + b);
 			// System.out.println(a + " " + b);
 			for (int i = 0; i < 8; i++) {
 				for (int k = 0; k < 8; k++) {
@@ -155,7 +176,7 @@ public class MainFrame extends JFrame {
 						saverIcon = field[a][b].button.getIcon();
 						saverFigure = field[a][b].figure;
 						eraseFigure(a, b);
-							
+
 						if (check() == true) {
 							moveFigure(i, k, a, b);
 							field[i][k].figure.team = saverTeam;
@@ -187,6 +208,8 @@ public class MainFrame extends JFrame {
 				dy = 0;
 			else
 				dy = -1;
+			
+			System.out.println("xKiller " + xKiller + "yKiller " + yKiller);
 
 			do {
 				a = a + dx;
@@ -195,6 +218,7 @@ public class MainFrame extends JFrame {
 					for (int k = 0; k < 8; k++) {
 						if (field[i][k].figure.validMove(i, k, a, b, field[a][b].figure.team)
 								&& jumpOverFigures(i, k, a, b)) {
+							System.out.println("a " + a + "b " + b);
 							moveFigure(i, k, a, b);
 							if (check()) {
 								moveFigure(a, b, i, k);
@@ -218,51 +242,37 @@ public class MainFrame extends JFrame {
 		} else
 			return false;
 	}
-	
+
 	public static boolean stalemate(int turn) {
 		if (!check()) {
-			int a = 0, b = 0;
 			for (int i = 0; i < 8; i++) {
 				for (int k = 0; k < 8; k++) {
-					if (field[i][k].figure.type == "king" && field[i][k].figure.team == turn) {
-						a = i;
-						b = k;
-					}
-				}
-			}
-			int c = 0, d = 0, e = 0;
-			for (int i = 0; i < 8; i++) {
-				for (int k = 0; k < 8; k++) {
-					if(Math.max(Math.abs(a - i), Math.abs(b - k)) == 1) {
-						d = d +1;
-						if (field[a][b].figure.validMove(a, b, i, k, turn) && field[i][k].figure.team != turn) {
-							moveFigure(a, b, i, k);
-							saverTeam = field[a][b].figure.team;
-							saverIcon = field[a][b].button.getIcon();
-							saverFigure = field[a][b].figure;
-							eraseFigure(a, b);
-							
-							if (check() == true) {
-								moveFigure(i, k, a, b);
-								field[i][k].figure.team = saverTeam;
-								field[i][k].button.setIcon(saverIcon);
-								field[i][k].figure = saverFigure;
-								c = c + 1;
-							} else {
-								moveFigure(i, k, a, b);
-								field[i][k].figure.team = saverTeam;
-								field[i][k].button.setIcon(saverIcon);
-								field[i][k].figure = saverFigure;
-								return false;
+					for (int a = 0; a < 8; a++) {
+						for (int b = 0; b < 8; b++) {
+							if (field[i][k].figure.validMove(i, k, a, b, field[a][b].figure.team)
+									&& field[i][k].figure.team == turn) {
+								moveFigure(a, b, i, k);
+								saverTeam = field[a][b].figure.team;
+								saverIcon = field[a][b].button.getIcon();
+								saverFigure = field[a][b].figure;
+								eraseFigure(a, b);
+
+								if (check() == true) {
+									moveFigure(i, k, a, b);
+									field[i][k].figure.team = saverTeam;
+									field[i][k].button.setIcon(saverIcon);
+									field[i][k].figure = saverFigure;
+								} else {
+									moveFigure(i, k, a, b);
+									field[i][k].figure.team = saverTeam;
+									field[i][k].button.setIcon(saverIcon);
+									field[i][k].figure = saverFigure;
+									return false;
+								}
 							}
-						} else {
-							
 						}
 					}
 				}
-			}
-			if(c == d) {
-				
 			}
 			lblMessages.setText("Пат!");
 			lblMessages.setForeground(new Color(218, 165, 32));
@@ -458,16 +468,28 @@ public class MainFrame extends JFrame {
 								lblMessages.setForeground(Color.RED);
 								return;
 							}
-							
+
 							moveFigure(movex, movey, x, y);
 							saverIcon = field[movex][movey].button.getIcon();
 							saverFigure = field[movex][movey].figure;
 							saverTeam = field[movex][movey].figure.team;
 							eraseFigure(movex, movey);
-								
-							if (check() == true && field[xKiller][yKiller].figure.team != turn) {
+
+							if (kingToKing()) {
 								moveFigure(x, y, movex, movey);
-								if(saverTeam != 0) {
+								if (saverTeam != 0) {
+									field[x][y].button.setIcon(saverIcon);
+									field[x][y].figure = saverFigure;
+								}
+								lblMessages.setText("Невалиден ход - цар до цар не може!");
+								lblMessages.setForeground(Color.RED);
+								stage = 0;
+								return;
+							}
+
+							if ((check() == true && field[xKiller][yKiller].figure.team != turn)) {
+								moveFigure(x, y, movex, movey);
+								if (saverTeam != 0) {
 									field[x][y].button.setIcon(saverIcon);
 									field[x][y].figure = saverFigure;
 								}
@@ -475,7 +497,7 @@ public class MainFrame extends JFrame {
 								lblMessages.setForeground(Color.RED);
 								stage = 0;
 								return;
-							} 
+							}
 							if (saverTeam == -1) {
 								JLabel lblKilled = new JLabel("");
 								lblKilled.setBounds((n1 % 8) * 75, 125 - (n1 / 8) * 75, 75, 75);
@@ -484,7 +506,7 @@ public class MainFrame extends JFrame {
 								panel_Player1.revalidate();
 								panel_Player1.repaint();
 								n1 = n1 + 1;
-							} else if (saverTeam == 1){
+							} else if (saverTeam == 1) {
 								JLabel lblKilled = new JLabel("");
 								lblKilled.setBounds((n2 % 8) * 75, 0 + (n2 / 8) * 75, 75, 75);
 								lblKilled.setIcon(saverIcon);
@@ -493,7 +515,7 @@ public class MainFrame extends JFrame {
 								panel_Player2.repaint();
 								n2 = n2 + 1;
 							}
-								saverTeam = 0;
+							saverTeam = 0;
 							if (field[x][y].figure.type == "pawn" && (x == 0 || x == 7)) {
 								field[x][y].figure.type = "queen";
 								if (field[x][y].figure.team == -1)
@@ -501,7 +523,7 @@ public class MainFrame extends JFrame {
 								else
 									field[x][y].button.setIcon(black_queen);
 							}
-							if(check()) {
+							if (check()) {
 								check();
 							} else {
 								lblMessages.setText("Да играем!");
